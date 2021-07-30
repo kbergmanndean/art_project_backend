@@ -1,27 +1,38 @@
 class ArtworksController < ApplicationController
     def index
         artworks=Artwork.all
-        render json:artworks
+        render json:artworks, include: [:artist, :museum]
     end
 
     def show
         artwork=Artwork.find_by(id:params[:id])
-        render json:artwork
+        render json:artwork, include: [:artist, :museum]
     end
 
     def create
         artwork_new=Artwork.create(artwork_params)
-        if artwork.valid?
-            render json:artwork, status: :created
+        if artwork_new.valid?
+            render json: artwork_new, include: [:artist, :museum], status: :created
         else
-            render json: {error:artwork.errors.full_messages}, status: :unprocessable_entity
+            render json: {error:artwork_new.errors.full_messages}, status: :unprocessable_entity
         end
+    end
+
+    def update
+        artwork_update=Artwork.find_by(id:params[:id])
+        artwork_update.update(comments:params[:artwork][:comments])
+        render json:artwork_update, include: [:artist,:museum]
     end
 
     def destroy
         artwork_destroy=Artwork.find_by(id:params[:id])
         artwork_destroy.destroy 
         head:no_content
+    end
+
+    private
+    def artwork_params
+        params.permit(:name,:artist_id, :museum_id, :year,:image_url, :comments)
     end
 
 
