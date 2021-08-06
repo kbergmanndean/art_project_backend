@@ -5,4 +5,6 @@ class Artwork < ApplicationRecord
 
     validates :name, presence: true 
     validates :year, length:{is:4}
+    validates :artist_id, presence: true
+    validates :museum_id, presence: true
 end
